@@ -7,8 +7,6 @@
     "start": "ts-node src/app.ts",
     "dev": "nodemon src/app.ts",
     "import": "ts-node src/importData.ts",
-    "import-platforms": "ts-node src/importPlatforms.ts",
-    "import-genres": "ts-node src/importGenres.ts",
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "format": "prettier --write 'src/**/*.{ts,tsx}'"
   },

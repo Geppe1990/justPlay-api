@@ -6,6 +6,8 @@ import Platform from "./models/Platform"
 import Genre from "./models/Genre"
 
 const mongoUri = "mongodb://localhost:27017/videogames"
+// const database = "videogames_data"
+const database = "debug"
 
 mongoose.connect(mongoUri, {
 	useNewUrlParser: true,
@@ -46,7 +48,7 @@ const parseJSON = (data: string, fieldName: string, fallback: any = []) => {
 	}
 }
 
-fs.createReadStream("videogames_data.csv")
+fs.createReadStream(`${database}.csv`)
 	.pipe(csv())
 	.on("data", (data) => results.push(data))
 	.on("end", async () => {
