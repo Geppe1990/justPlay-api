@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose, { Types } from "mongoose"
 import fs from "fs"
 import csv from "csv-parser"
 import Game from "./models/Game"
@@ -6,8 +6,6 @@ import Platform from "./models/Platform"
 import Genre from "./models/Genre"
 
 const mongoUri = "mongodb://localhost:27017/videogames"
-// const database = "videogames_data"
-const database = "debug"
 
 mongoose.connect(mongoUri, {
 	useNewUrlParser: true,
@@ -48,7 +46,7 @@ const parseJSON = (data: string, fieldName: string, fallback: any = []) => {
 	}
 }
 
-fs.createReadStream(`${database}.csv`)
+fs.createReadStream("debug.csv")
 	.pipe(csv())
 	.on("data", (data) => results.push(data))
 	.on("end", async () => {
@@ -61,25 +59,27 @@ fs.createReadStream(`${database}.csv`)
 				}
 
 				const platformNames = parseJSON(game.platforms, 'platforms', [])
-				const platformIds = []
+				const platformIds: Types.ObjectId[] = []
 				for (const platformName of platformNames) {
-					const platform = await Platform.findOne({ name: platformName.name })
-					if (platform) {
-						platformIds.push(platform._id)
-					} else {
-						console.error(`Platform ${platformName.name} not found`)
+					let platform = await Platform.findOne({ id: platformName.id })
+					if (!platform) {
+						platform = new Platform({ id: platformName.id, name: platformName.name })
+						await platform.save()
+						console.log(`Platform ${platform.name} created successfully`)
 					}
+					platformIds.push(platform._id as Types.ObjectId)  // Cast a Types.ObjectId
 				}
 
 				const genreNames = parseJSON(game.genres, 'genres', [])
-				const genreIds = []
+				const genreIds: Types.ObjectId[] = []
 				for (const genreName of genreNames) {
-					const genre = await Genre.findOne({ name: genreName.name })
-					if (genre) {
-						genreIds.push(genre._id)
-					} else {
-						console.error(`Genre ${genreName.name} not found`)
+					let genre = await Genre.findOne({ id: genreName.id })
+					if (!genre) {
+						genre = new Genre({ id: genreName.id, name: genreName.name })
+						await genre.save()
+						console.log(`Genre ${genre.name} created successfully`)
 					}
+					genreIds.push(genre._id as Types.ObjectId)  // Cast a Types.ObjectId
 				}
 
 				const newGame = new Game({
