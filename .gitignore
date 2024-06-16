@@ -128,3 +128,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+videogames_data.csv
+.DS_Store
+videogames_data.csv
