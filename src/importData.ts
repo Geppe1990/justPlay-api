@@ -46,11 +46,15 @@ const parseJSON = (data: string, fieldName: string, fallback: any = []) => {
 	}
 }
 
-fs.createReadStream("debug.csv")
+const genreCache = new Map<string, Types.ObjectId>()
+const platformCache = new Map<string, Types.ObjectId>()
+
+fs.createReadStream("videogames_data.csv")
 	.pipe(csv())
 	.on("data", (data) => results.push(data))
 	.on("end", async () => {
 		for (const game of results) {
+			console.log(`Processing game ${game.name} with ID ${game.id}`);
 			try {
 				const existingGame = await Game.findOne({ id: game.id })
 				if (existingGame) {
@@ -61,25 +65,35 @@ fs.createReadStream("debug.csv")
 				const platformNames = parseJSON(game.platforms, 'platforms', [])
 				const platformIds: Types.ObjectId[] = []
 				for (const platformName of platformNames) {
-					let platform = await Platform.findOne({ id: platformName.id })
-					if (!platform) {
-						platform = new Platform({ id: platformName.id, name: platformName.name })
-						await platform.save()
-						console.log(`Platform ${platform.name} created successfully`)
+					if (platformCache.has(platformName.name)) {
+						platformIds.push(platformCache.get(platformName.name)!)
+					} else {
+						let platform = await Platform.findOne({ name: platformName.name })
+						if (!platform) {
+							platform = new Platform({ id: platformName.id, name: platformName.name })
+							await platform.save()
+							console.log(`Platform ${platform.name} created successfully`)
+						}
+						platformCache.set(platformName.name, platform._id as Types.ObjectId)
+						platformIds.push(platform._id as Types.ObjectId)
 					}
-					platformIds.push(platform._id as Types.ObjectId)  // Cast a Types.ObjectId
 				}
 
 				const genreNames = parseJSON(game.genres, 'genres', [])
 				const genreIds: Types.ObjectId[] = []
 				for (const genreName of genreNames) {
-					let genre = await Genre.findOne({ id: genreName.id })
-					if (!genre) {
-						genre = new Genre({ id: genreName.id, name: genreName.name })
-						await genre.save()
-						console.log(`Genre ${genre.name} created successfully`)
+					if (genreCache.has(genreName.name)) {
+						genreIds.push(genreCache.get(genreName.name)!)
+					} else {
+						let genre = await Genre.findOne({ name: genreName.name })
+						if (!genre) {
+							genre = new Genre({ id: genreName.id, name: genreName.name })
+							await genre.save()
+							console.log(`Genre ${genre.name} created successfully`)
+						}
+						genreCache.set(genreName.name, genre._id as Types.ObjectId)
+						genreIds.push(genre._id as Types.ObjectId)
 					}
-					genreIds.push(genre._id as Types.ObjectId)  // Cast a Types.ObjectId
 				}
 
 				const newGame = new Game({
