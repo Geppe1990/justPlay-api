@@ -1,6 +1,7 @@
 import { Router } from "express"
 import gameController from "../controllers/gameController"
 import cache from "../middleware/cache";
+import passport from '../config/passport'
 
 const router = Router()
 
@@ -103,4 +104,5 @@ router.get('/:id', cache('5 minutes'), gameController.getGameById)
 router.get('/search/:name', cache('5 minutes'), gameController.searchGamesByName)
 // router.get('/genre/:genreId', cache('5 minutes'), gameController.getGamesByGenre)
 // router.get('/platform/:platformId', cache('5 minutes'), gameController.getGamesByPlatform)
+
 export default router

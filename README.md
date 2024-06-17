@@ -84,47 +84,65 @@ L'applicazione raccoglie metriche Prometheus tramite `prom-client` e le espone a
 ### 6. Documentazione Swagger
 L'applicazione è documentata tramite Swagger. Puoi accedere alla documentazione interattiva all'endpoint `/api-docs`.
 
-## API Endpoints
+## Guida all'Utilizzo
 
-### Autenticazione
+### Creazione di un Utente
 
-- **POST /auth/register**: Registra un nuovo utente.
-    - Body: `{ "username": "your_username", "password": "your_password" }`
+Per registrare un nuovo utente, utilizza l'endpoint di registrazione.
 
-- **POST /auth/login**: Effettua il login e restituisce un token JWT.
-    - Body: `{ "username": "your_username", "password": "your_password" }`
+- **Endpoint**: `POST /auth/register`
+- **Body**:
+  ```json
+  {
+    "username": "your_username",
+    "password": "your_password"
+  }
+  ```
+- **Esempio**
+    ```bash
+  curl -X POST http://localhost:3000/auth/register \\
+  -H "Content-Type: application/json" \\
+  -d '{"username": "your_username", "password": "your_password"}'
+    ```
 
-### Videogiochi
+### Login di un Utente
 
-- **GET /games**: Ottiene tutti i giochi con paginazione.
-    - Query params: `page`, `limit`
+Per effettuare il login di un utente registrato, utilizza l’endpoint di login.
 
-- **GET /games/:id**: Ottiene un gioco specifico per ID.
+- **Endpoint**: `POST /auth/login`
+- **Body**:
+  ```json
+  {
+    "username": "your_username",
+    "password": "your_password"
+  }
+  ```
+- **Risposta**
+    ```json
+    {
+        "token": "jwt_token"
+    }
+    ```
+- **Esempio**
+  ```bash
+    curl -X POST http://localhost:3000/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"username": "your_username", "password": "your_password"}'
+  ```
 
-- **GET /games/search/:name**: Cerca giochi per nome.
+### Accesso alle rotte protette
 
-- **GET /games/genre/:genreId**: Ottiene giochi per genere.
+Per accedere alle rotte protette, è necessario includere il token JWT nell’intestazione Authorization delle richieste.
 
-- **GET /games/platform/:platformId**: Ottiene giochi per piattaforma.
+- **Intestazione**:
+  ```json
+  {
+      Authorization: Bearer jwt_token
+  }
+  ```
+- **Esempio**
+  ```bash
+    curl -X GET http://localhost:3000/games \
+    -H "Authorization: Bearer jwt_token"
+  ```
 
-### Metriche
-
-- **GET /metrics**: Espone le metriche Prometheus.
-
-### Documentazione API
-
-- **GET /api-docs**: Accedi alla documentazione Swagger delle API.
-
-## Sviluppo
-
-### Esecuzione dei Test
-
-Per eseguire i test, assicurati di avere un file `.env.test` configurato con le variabili di ambiente necessarie.
-
-Esegui i test:
-```bash
-npm test
-```
-
-### Conclusione
-Questo `README.md` fornisce una guida generale del progetto, includendo le informazioni necessarie per l'installazione, la struttura del progetto, le funzionalità implementate, gli endpoint API disponibili, e come contribuire al progetto. Se ci sono ulteriori dettagli o specifiche che desideri aggiungere, fammelo sapere!
