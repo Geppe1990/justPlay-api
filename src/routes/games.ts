@@ -1,7 +1,7 @@
 import { Router } from "express"
 import gameController from "../controllers/gameController"
-import cache from "../middleware/cache";
-import passport from '../config/passport'
+import cache from "../middleware/cache"
+import passport from "../config/passport"
 
 const router = Router()
 
@@ -49,7 +49,7 @@ const router = Router()
  *                   items:
  *                     $ref: '#/components/schemas/Game'
  */
-router.get('/', cache('5 minutes'), gameController.getAllGames)
+router.get('/', passport.authenticate('jwt', { session: false }), cache('5 minutes'), gameController.getAllGames)
 
 /**
  * @swagger
@@ -74,7 +74,7 @@ router.get('/', cache('5 minutes'), gameController.getAllGames)
  *       404:
  *         description: Game not found.
  */
-router.get('/:id', cache('5 minutes'), gameController.getGameById)
+router.get('/:id', passport.authenticate('jwt', { session: false }), cache('5 minutes'), gameController.getGameById)
 
 /**
  * @swagger
@@ -101,7 +101,8 @@ router.get('/:id', cache('5 minutes'), gameController.getGameById)
  *       404:
  *         description: No games found with the given name.
  */
-router.get('/search/:name', cache('5 minutes'), gameController.searchGamesByName)
+router.get('/search/:name', passport.authenticate('jwt', { session: false }), cache('5 minutes'), gameController.searchGamesByName)
+
 // router.get('/genre/:genreId', cache('5 minutes'), gameController.getGamesByGenre)
 // router.get('/platform/:platformId', cache('5 minutes'), gameController.getGamesByPlatform)
 
