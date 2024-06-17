@@ -3,7 +3,9 @@ import gameService from "../services/gameService"
 import logger from "../utils/logger"
 
 const buildUrl = (req: Request, page: number): string => {
-	const url = new URL(`${req.protocol}://${req.get("host")}${req.baseUrl}${req.path}`)
+	const url = new URL(
+		`${req.protocol}://${req.get("host")}${req.baseUrl}${req.path}`,
+	)
 	url.searchParams.set("page", page.toString())
 	return url.toString()
 }
@@ -14,7 +16,8 @@ const getAllGames = async (req: Request, res: Response) => {
 		const limit = parseInt(req.query.limit as string) || 10
 		const result = await gameService.getAllGames(page, limit)
 
-		const nextPage = page < result.totalPages ? buildUrl(req, page + 1) : null
+		const nextPage =
+			page < result.totalPages ? buildUrl(req, page + 1) : null
 		const prevPage = page > 1 ? buildUrl(req, page - 1) : null
 
 		logger.info("Fetched games", { page, limit, total: result.totalGames })
@@ -22,7 +25,7 @@ const getAllGames = async (req: Request, res: Response) => {
 		res.json({
 			...result,
 			next: nextPage,
-			prev: prevPage
+			prev: prevPage,
 		})
 	} catch (err) {
 		const error = err as Error
@@ -42,7 +45,10 @@ const getGameById = async (req: Request, res: Response) => {
 		res.json(game)
 	} catch (err) {
 		const error = err as Error
-		logger.error("Error fetching game by ID", { id: req.params.id, error: error.message })
+		logger.error("Error fetching game by ID", {
+			id: req.params.id,
+			error: error.message,
+		})
 		res.status(500).send({ error: error.message })
 	}
 }
@@ -59,7 +65,10 @@ const searchGamesByName = async (req: Request, res: Response) => {
 		res.json(games)
 	} catch (err) {
 		const error = err as Error
-		logger.error("Error searching games by name", { name, error: error.message })
+		logger.error("Error searching games by name", {
+			name,
+			error: error.message,
+		})
 		res.status(500).send({ error: error.message })
 	}
 }
@@ -67,5 +76,5 @@ const searchGamesByName = async (req: Request, res: Response) => {
 export default {
 	getAllGames,
 	getGameById,
-	searchGamesByName
+	searchGamesByName,
 }

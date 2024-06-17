@@ -5,7 +5,7 @@ interface IPlatform extends Document {
 }
 
 const platformSchema = new Schema({
-	name: { type: String, required: true }
+	name: { type: String, required: true },
 })
 
 const Platform = model<IPlatform>("Platform", platformSchema)

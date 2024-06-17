@@ -1,5 +1,5 @@
-import { Router } from 'express'
-import gameController from '../controllers/gameController'
+import { Router } from "express"
+import gameController from "../controllers/gameController"
 
 const router = Router()
 
@@ -47,7 +47,7 @@ const router = Router()
  *                   items:
  *                     $ref: '#/components/schemas/Game'
  */
-router.get('/', gameController.getAllGames)
+router.get("/", gameController.getAllGames)
 
 /**
  * @swagger
@@ -72,7 +72,7 @@ router.get('/', gameController.getAllGames)
  *       404:
  *         description: Game not found.
  */
-router.get('/:id', gameController.getGameById)
+router.get("/:id", gameController.getGameById)
 
 /**
  * @swagger
@@ -99,6 +99,6 @@ router.get('/:id', gameController.getGameById)
  *       404:
  *         description: No games found with the given name.
  */
-router.get('/search/:name', gameController.searchGamesByName)
+router.get("/search/:name", gameController.searchGamesByName)
 
 export default router

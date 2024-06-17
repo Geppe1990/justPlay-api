@@ -7,15 +7,18 @@ import Genre from "./models/Genre"
 
 const mongoUri = "mongodb://localhost:27017/videogames"
 
-mongoose.connect(mongoUri, {
-	useNewUrlParser: true,
-	useUnifiedTopology: true
-} as mongoose.ConnectOptions).then(() => {
-	console.log("Connected to MongoDB")
-}).catch(err => {
-	console.error("Failed to connect to MongoDB", err)
-	process.exit(1)
-})
+mongoose
+	.connect(mongoUri, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true,
+	} as mongoose.ConnectOptions)
+	.then(() => {
+		console.log("Connected to MongoDB")
+	})
+	.catch((err) => {
+		console.error("Failed to connect to MongoDB", err)
+		process.exit(1)
+	})
 
 const results: any[] = []
 
@@ -41,7 +44,10 @@ const parseJSON = (data: string, fieldName: string, fallback: any = []) => {
 			return fallback
 		}
 	} catch (error) {
-		console.error(`Failed to parse JSON of game ${fieldName} in field [${fieldName}]: ${data}`, error)
+		console.error(
+			`Failed to parse JSON of game ${fieldName} in field [${fieldName}]: ${data}`,
+			error,
+		)
 		return fallback
 	}
 }
@@ -54,44 +60,66 @@ fs.createReadStream("videogames_data.csv")
 	.on("data", (data) => results.push(data))
 	.on("end", async () => {
 		for (const game of results) {
-			console.log(`Processing game ${game.name} with ID ${game.id}`);
+			console.log(`Processing game ${game.name} with ID ${game.id}`)
 			try {
 				const existingGame = await Game.findOne({ id: game.id })
 				if (existingGame) {
-					console.log(`Game with id ${game.id} already exists, skipping.`)
+					console.log(
+						`Game with id ${game.id} already exists, skipping.`,
+					)
 					continue
 				}
 
-				const platformNames = parseJSON(game.platforms, 'platforms', [])
+				const platformNames = parseJSON(game.platforms, "platforms", [])
 				const platformIds: Types.ObjectId[] = []
 				for (const platformName of platformNames) {
 					if (platformCache.has(platformName.name)) {
 						platformIds.push(platformCache.get(platformName.name)!)
 					} else {
-						let platform = await Platform.findOne({ name: platformName.name })
+						let platform = await Platform.findOne({
+							name: platformName.name,
+						})
 						if (!platform) {
-							platform = new Platform({ id: platformName.id, name: platformName.name })
+							platform = new Platform({
+								id: platformName.id,
+								name: platformName.name,
+							})
 							await platform.save()
-							console.log(`Platform ${platform.name} created successfully`)
+							console.log(
+								`Platform ${platform.name} created successfully`,
+							)
 						}
-						platformCache.set(platformName.name, platform._id as Types.ObjectId)
+						platformCache.set(
+							platformName.name,
+							platform._id as Types.ObjectId,
+						)
 						platformIds.push(platform._id as Types.ObjectId)
 					}
 				}
 
-				const genreNames = parseJSON(game.genres, 'genres', [])
+				const genreNames = parseJSON(game.genres, "genres", [])
 				const genreIds: Types.ObjectId[] = []
 				for (const genreName of genreNames) {
 					if (genreCache.has(genreName.name)) {
 						genreIds.push(genreCache.get(genreName.name)!)
 					} else {
-						let genre = await Genre.findOne({ name: genreName.name })
+						let genre = await Genre.findOne({
+							name: genreName.name,
+						})
 						if (!genre) {
-							genre = new Genre({ id: genreName.id, name: genreName.name })
+							genre = new Genre({
+								id: genreName.id,
+								name: genreName.name,
+							})
 							await genre.save()
-							console.log(`Genre ${genre.name} created successfully`)
+							console.log(
+								`Genre ${genre.name} created successfully`,
+							)
 						}
-						genreCache.set(genreName.name, genre._id as Types.ObjectId)
+						genreCache.set(
+							genreName.name,
+							genre._id as Types.ObjectId,
+						)
 						genreIds.push(genre._id as Types.ObjectId)
 					}
 				}
@@ -100,9 +128,13 @@ fs.createReadStream("videogames_data.csv")
 					id: game.id,
 					name: game.name,
 					summary: game.summary,
-					release_dates: parseJSON(game.release_dates, 'release_dates', []),
+					release_dates: parseJSON(
+						game.release_dates,
+						"release_dates",
+						[],
+					),
 					genres: genreIds,
-					platforms: platformIds
+					platforms: platformIds,
 				})
 				await newGame.save()
 				console.log(`Game ${newGame.name} saved successfully`)
